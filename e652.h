@@ -73,10 +73,10 @@ extern struct e652 E;
 
 #define Pset(f,c) (E.P = (E.P & ~(f)) | ((c) ? (f) : 0))
 
-#define push() (E.m[SPAGE + E.SP--])
-#define pop() (E.m[SPAGE + ++E.SP])
+#define push(v) (e652_write(SPAGE + E.SP--, (v)))
+#define pop() (e652_read(SPAGE + ++E.SP))
 
-#define nextpc() (E.m[E.PC++])
+#define nextpc() (e652_read(E.PC++))
 
 
 /*
