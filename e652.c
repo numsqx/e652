@@ -20,7 +20,7 @@ void e652_reset (void)
   E.X = 0;
   E.Y = 0;
   E.P = 0x34;
-  E.SP = 0xFD;  /* 6502 starts here */
+  E.S = 0xFD;  /* 6502 starts here */
 }
 
 

@@ -57,7 +57,7 @@ void dump_state (void)
   printf("  A       0x%02X      %d\n", E.A, E.A);
   printf("  X       0x%02X      %d\n", E.X, E.X);
   printf("  Y       0x%02X      %d\n", E.Y, E.Y);
-  printf("  SP      0x%02X      %d\n", E.SP, E.SP);
+  printf("  S       0x%02X      %d\n", E.S, E.S);
   printf("  P       0x%02X      %d\n", E.P, E.P);
   /* print flags */
   printf("  flags  ");

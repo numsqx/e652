@@ -24,7 +24,7 @@ struct e652 {
   word A;         /* Accumulator register. */
   word X, Y;      /* Index (general) regs. */
   word P;         /* Status register. */
-  word SP;        /* Stack pointer. */
+  word S;         /* Stack pointer. */
 };
 
 extern struct e652 E;
@@ -73,8 +73,8 @@ extern struct e652 E;
 
 #define Pset(f,c) (E.P = (E.P & ~(f)) | ((c) ? (f) : 0))
 
-#define push(v) (e652_write(SPAGE + E.SP--, (v)))
-#define pop() (e652_read(SPAGE + ++E.SP))
+#define push(v) (e652_write(SPAGE + E.S--, (v)))
+#define pop() (e652_read(SPAGE + ++E.S))
 
 #define nextpc() (e652_read(E.PC++))
 
