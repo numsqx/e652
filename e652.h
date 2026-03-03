@@ -38,8 +38,10 @@ extern struct e652 E;
 #define EZ (1<<1)  /* Zero */
 #define EC (1<<0)  /* Carry */
 
-#define MLEN (1<<16)
-#define MMAX (MLEN-1)
+#define Pset(f,c) (E.P = (E.P & ~(f)) | ((c) ? (f) : 0)) /* Assigns a flag */
+
+#define MLEN (1<<16) /* Length of memory */
+#define MMAX (MLEN-1) /* Max possible address (can be used as a wrap mask) */
 
 #define ZPAGE (0x0000) /* Zero page */
 #define SPAGE (0x0100) /* Stack page */
@@ -49,34 +51,11 @@ extern struct e652 E;
 #define V_RES (VPAGE + 0xfc)  /* Reset vector */
 #define V_IRQ (VPAGE + 0xfe)  /* Interrupt request */
 
-/* addressing modes for cc == 01 */
-#define A1_INDX (0) /* (indirect,X) */
-#define A1_ZPG (1) /* zeropage */
-#define A1_IMM (2) /* immediate */
-#define A1_ABS (3) /* absolute */
-#define A1_INDY (4) /* (indirect),Y */
-#define A1_ZPGX (5) /* zeropage,X */
-#define A1_ABSY (6) /* absolute,Y */
-#define A1_ABSX (7) /* absolute,X */
+#define b1(addr) (E.m[(addr) & MMAX]) /* 1B write + wrap-around */
+#define b2(addr) (b1((addr)) | b1((addr)+1) << 8) /* 2B write + wrap-around */
 
-/* addressing modes for cc == 02 */
-#define A2_IMM (0) /* immediate */
-#define A2_ZPG (1) /* zeropage */
-#define A2_ACC (2) /* accumulator */
-#define A2_ABS (3) /* absolute */
-#define A2_ZPGN (5) /* zeropage,X or Y */
-#define A2_ABSN (7) /* absolute,X or Y */
-
-/* useful macros */
-#define b1(addr) (E.m[(addr) & MMAX])
-#define b2(addr) (b1((addr)) | b1((addr)+1) << 8)
-
-#define Pset(f,c) (E.P = (E.P & ~(f)) | ((c) ? (f) : 0))
-
-#define push(v) (e652_write(SPAGE + E.S--, (v)))
-#define pop() (e652_read(SPAGE + ++E.S))
-
-#define nextpc() (e652_read(E.PC++))
+#define push(v) (e652_write(SPAGE + E.S--, (v))) /* Stack push */
+#define pop() (e652_read(SPAGE + ++E.S)) /* Stack pop */
 
 
 /*
@@ -85,13 +64,10 @@ extern struct e652 E;
 void e652_reset (void);
 
 /*
- * Get the effective memory address. Returns either a mem address between
- * 0 to 65536, EFF_ACCUM for the accumulator register, or EFF_INV. n would
- * be the value of the indexing register to use if cc == 10.
+ * Get the effective memory address. Returns a mem address between 0 to 65536.
+ * Returns -1 on error. Works only for opcodes with cc == 01.
  */
-int e652_effaddr (word opcode, word n);
-#define EFF_INV   (-1)
-#define EFF_ACCUM (-2)
+int e652_effaddr01 (word opcode);
 
 /*
  * Read byte from memory.

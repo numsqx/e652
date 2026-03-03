@@ -7,6 +7,7 @@
  */
 
 #include "e652.h"
+#include "e652_extras.h"
 
 
 /* Static definition of E652 execution context. */
@@ -24,60 +25,22 @@ void e652_reset (void)
 }
 
 
-int e652_effaddr (word opcode, word n)
+int e652_effaddr01 (word opcode)
 {
-  word zp_addr, hi, lo; /* declaration only */
   char cc = opcode & 0x3;
   char bbb = (opcode >> 2) & 0x7;
-  if (cc == 1) goto cc01;
-  if (cc == 2) goto cc10;
-  return EFF_INV;
-
-cc01:
+  if (cc != 1) return -1;
   switch (bbb) {
-    case A1_INDX: n = E.X; goto indn;
-    case A1_ZPG:  n = 0;   goto zpgn;
-    case A1_IMM:  /* ~n */ goto imm;
-    case A1_ABS:  n = 0;   goto absn;
-    case A1_INDY: n = E.Y; goto indn;
-    case A1_ZPGX: n = E.X; goto zpgn;
-    case A1_ABSY: n = E.Y; goto absn;
-    case A1_ABSX: n = E.X; goto absn;
-    default: return EFF_INV;
+    case A1_INDX: return reslv_indn(E.X);
+    case A1_ZPG:  return reslv_zpgn(0);
+    case A1_IMM:  return reslv_imm();
+    case A1_ABS:  return reslv_absn(0);
+    case A1_INDY: return reslv_indn(E.Y);
+    case A1_ZPGX: return reslv_zpgn(E.X);
+    case A1_ABSY: return reslv_absn(E.Y);
+    case A1_ABSX: return reslv_absn(E.X);
+    default: return -1;
   }
-
-cc10:
-  switch (bbb) {
-    case A2_IMM:  /* ~n */ goto imm;
-    case A2_ZPG:  n = 0;   goto zpgn;
-    case A2_ACC:  /* ~n */ goto acc;
-    case A2_ABS:  n = 0;   goto absn;
-    case A2_ZPGN:          goto zpgn;
-    case A2_ABSN:          goto absn;
-    default: return EFF_INV;
-  }
-
-imm:
-  return (E.PC++) & MMAX;
-acc:
-  return EFF_ACCUM;
-
-/* zeropage addressing */
-zpgn:
-  return (ZPAGE + ((e652_read(E.PC++) + n) & 0xff)) & MMAX;
-
-/* absolute addressing */
-absn:
-  lo = e652_read(E.PC++);
-  hi = e652_read(E.PC++);
-  return ((lo | hi << 8) + n) & MMAX;
-
-/* indirect addressing */
-indn:
-  zp_addr = (e652_read(E.PC++) + n) & 0xff;
-  lo = e652_read(ZPAGE + zp_addr);
-  hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
-  return (lo | hi << 8) & MMAX;
 }
 
 
@@ -121,13 +84,6 @@ int e652_exec (void)
     [0xBD] = &&I_LDA, /* ABSX */
     [0xB9] = &&I_LDA, /* ABSY */
 
-    /* LDX: cc=10 */
-    [0xA2] = &&I_LDX, /* IMM */
-    [0xAE] = &&I_LDX, /* ABS */
-    [0xA6] = &&I_LDX, /* ZPG */
-    [0xBE] = &&I_LDX, /* ABSY */
-    [0xB6] = &&I_LDX, /* ZPGY */
-
     /* STA: cc=01 */
     [0x8D] = &&I_STA, /* ABS */
     [0x85] = &&I_STA, /* ZPG */
@@ -150,18 +106,12 @@ I_BRK:
   return H_DBUG;
 
 I_LDA:
-  E.A = e652_read(e652_effaddr(opcode, 0));
+  E.A = e652_read(e652_effaddr01(opcode));
   Pset(EZ, E.A == 0);
   Pset(EN, E.A >> 7);
   goto nextinst();
 
-I_LDX:
-  E.X = e652_read(e652_effaddr(opcode, 0));
-  Pset(EZ, E.X == 0);
-  Pset(EN, E.X >> 7);
-  goto nextinst();
-
 I_STA:
-  e652_write(e652_effaddr(opcode, 0), E.A);
+  e652_write(e652_effaddr01(opcode), E.A);
   goto nextinst();
 }
