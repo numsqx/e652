@@ -19,9 +19,10 @@ ALL_O= $(ALL_S:.asm=.o)
 ALL_B= $(ALL_S:.asm=.bin)
 ALL_T= $(ALL_S:.asm=-test)
 
-.PHONY: test clean help echo list
+.PHONY: test bin clean help echo list
 
-test: $(ALL_T) $(ALL_B)
+test: $(ALL_T) bin
+bin: $(ALL_B)
 
 %-test: %.bin | $(E652)
 	@echo '=== TEST: $@'
@@ -39,6 +40,11 @@ help:
 	@echo '  clean       Remove generated files'
 	@echo '  echo        Print make vars'
 	@echo '  list        List all available tests'
+	@echo 'By test'
+	@echo '  test        Run all tests'
+	@echo '  TEST-test   Run a test named "TEST"'
+	@echo '  bin         Compile all tests'
+	@echo '  TEST.bin    Compile a test named "TEST"'
 
 echo:
 	@echo 'CA65 = $(CA65)'
