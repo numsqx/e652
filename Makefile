@@ -7,6 +7,7 @@ CWARNS= \
   -Wwrite-strings \
   -Wdisabled-optimization \
   -Wmissing-declarations \
+  -Wno-override-init \
   # -pedantic
 
 MYCFLAGS= $(CWARNS) -std=gnu99
@@ -14,7 +15,6 @@ MYLDFLAGS=
 
 CC= gcc
 RM= rm -rf
-MKDIR= mkdir -p
 
 CFLAGS= -Wall -Wextra $(MYCFLAGS) -MMD -MP
 LDFLAGS= $(MYLDFLAGS)
@@ -39,7 +39,7 @@ release:  CFLAGS+= -O2 -DNDEBUG -march=native
 ci:       CFLAGS+= -Werror
 
 test: all
-	@echo 'No tests yet.'
+	$(MAKE) -C./test
 
 clean:
 	$(RM) $(ALL_O) $(ALL_D) $(ALL_T)

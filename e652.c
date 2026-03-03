@@ -100,31 +100,45 @@ void e652_write (dword addr, word val)
 
 int e652_exec (void)
 {
-  static void *dtab[256];
   word opcode;
+  static void *dtab[256] = {
+    [0 ... 255] = &&unknown,
+    #ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Woverride-init"
+    #endif
 
-  for (int i = 0; i < 256; i++)
-    dtab[i] = &&unknown;
+    /* BRK */
+    [0x00] = &&I_BRK,
 
-  /* LDA */
-  dtab[0xA9] = &&I_LDA;
-  dtab[0xA5] = &&I_LDA;
-  dtab[0xB5] = &&I_LDA;
-  dtab[0xAD] = &&I_LDA;
-  dtab[0xBD] = &&I_LDA;
-  dtab[0xB9] = &&I_LDA;
-  dtab[0xA1] = &&I_LDA;
-  dtab[0xB1] = &&I_LDA;
+    /* LDA */
+    [0xA9] = &&I_LDA,
+    [0xA5] = &&I_LDA,
+    [0xB5] = &&I_LDA,
+    [0xAD] = &&I_LDA,
+    [0xBD] = &&I_LDA,
+    [0xB9] = &&I_LDA,
+    [0xA1] = &&I_LDA,
+    [0xB1] = &&I_LDA,
 
-  /* LDX */
-  dtab[0xA2] = &&I_LDX;
-  dtab[0xA6] = &&I_LDX;
-  dtab[0xB6] = &&I_LDX;
-  dtab[0xAE] = &&I_LDX;
-  dtab[0xBE] = &&I_LDX;
+    /* LDX */
+    [0xA2] = &&I_LDX,
+    [0xA6] = &&I_LDX,
+    [0xB6] = &&I_LDX,
+    [0xAE] = &&I_LDX,
+    [0xBE] = &&I_LDX,
+
+    #ifdef __clang__
+    #pragma clang diagnostic pop
+    #endif
+  };
 
 unknown:
   goto nextinst();
+
+I_BRK:
+  /* TODO: real implementation */
+  return H_DBUG;
 
 I_LDA:
   E.A = e652_read(e652_effaddr(opcode, 0));
