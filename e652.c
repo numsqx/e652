@@ -95,10 +95,16 @@ void e652_write (dword addr, word val)
 }
 
 
+#define nextinst() *dtab[opcode = nextpc()]
+
+
 int e652_exec (void)
 {
   static void *dtab[256];
   word opcode;
+
+  for (int i = 0; i < 256; i++)
+    dtab[i] = &&unknown;
 
   /* LDA */
   dtab[0xA9] = &&I_LDA;
@@ -117,21 +123,18 @@ int e652_exec (void)
   dtab[0xAE] = &&I_LDX;
   dtab[0xBE] = &&I_LDX;
 
-br:
-  opcode = nextpc();
-  if (dtab[opcode])
-    goto *dtab[opcode];
-  goto br;
+unknown:
+  goto nextinst();
 
 I_LDA:
   E.A = e652_read(e652_effaddr(opcode, 0));
   Pset(EZ, E.A == 0);
   Pset(EN, E.A >> 7);
-  goto br;
+  goto nextinst();
 
 I_LDX:
   E.X = e652_read(e652_effaddr(opcode, 0));
   Pset(EZ, E.A == 0);
   Pset(EN, E.A >> 7);
-  goto br;
+  goto nextinst();
 }
