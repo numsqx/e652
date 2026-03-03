@@ -134,7 +134,7 @@ I_LDA:
 
 I_LDX:
   E.X = e652_read(e652_effaddr(opcode, 0));
-  Pset(EZ, E.A == 0);
-  Pset(EN, E.A >> 7);
+  Pset(EZ, E.X == 0);
+  Pset(EN, E.X >> 7);
   goto nextinst();
 }
