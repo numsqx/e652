@@ -111,22 +111,31 @@ int e652_exec (void)
     /* BRK */
     [0x00] = &&I_BRK,
 
-    /* LDA */
-    [0xA9] = &&I_LDA,
-    [0xA5] = &&I_LDA,
-    [0xB5] = &&I_LDA,
-    [0xAD] = &&I_LDA,
-    [0xBD] = &&I_LDA,
-    [0xB9] = &&I_LDA,
-    [0xA1] = &&I_LDA,
-    [0xB1] = &&I_LDA,
+    /* LDA: cc=01 */
+    [0xA9] = &&I_LDA, /* IMM */
+    [0xAD] = &&I_LDA, /* ABS */
+    [0xA5] = &&I_LDA, /* ZPG */
+    [0xA1] = &&I_LDA, /* INDX */
+    [0xB1] = &&I_LDA, /* INDY */
+    [0xB5] = &&I_LDA, /* ZPGX */
+    [0xBD] = &&I_LDA, /* ABSX */
+    [0xB9] = &&I_LDA, /* ABSY */
 
-    /* LDX */
-    [0xA2] = &&I_LDX,
-    [0xA6] = &&I_LDX,
-    [0xB6] = &&I_LDX,
-    [0xAE] = &&I_LDX,
-    [0xBE] = &&I_LDX,
+    /* LDX: cc=10 */
+    [0xA2] = &&I_LDX, /* IMM */
+    [0xAE] = &&I_LDX, /* ABS */
+    [0xA6] = &&I_LDX, /* ZPG */
+    [0xBE] = &&I_LDX, /* ABSY */
+    [0xB6] = &&I_LDX, /* ZPGY */
+
+    /* STA: cc=01 */
+    [0x8D] = &&I_STA, /* ABS */
+    [0x85] = &&I_STA, /* ZPG */
+    [0x81] = &&I_STA, /* INDX */
+    [0x91] = &&I_STA, /* INDY */
+    [0x95] = &&I_STA, /* ZPGX */
+    [0x9D] = &&I_STA, /* ABSX */
+    [0x99] = &&I_STA, /* ABSY */
 
     #ifdef __clang__
     #pragma clang diagnostic pop
@@ -150,5 +159,9 @@ I_LDX:
   E.X = e652_read(e652_effaddr(opcode, 0));
   Pset(EZ, E.X == 0);
   Pset(EN, E.X >> 7);
+  goto nextinst();
+
+I_STA:
+  e652_write(e652_effaddr(opcode, 0), E.A);
   goto nextinst();
 }
