@@ -64,9 +64,8 @@ extern struct e652 E;
 #define A2_ZPG (1) /* zeropage */
 #define A2_ACC (2) /* accumulator */
 #define A2_ABS (3) /* absolute */
-#define A2_ZPGY (5) /* zeropage,Y */
-#define A2_ABSY (6) /* absolute,Y */
-#define A2_ABSX (7) /* absolute,X */
+#define A2_ZPGN (5) /* zeropage,X or Y */
+#define A2_ABSN (7) /* absolute,X or Y */
 
 /* useful macros */
 #define b1(addr) (E.m[(addr) & MMAX])
@@ -86,9 +85,23 @@ extern struct e652 E;
 void e652_reset (void);
 
 /*
- * Get a pointer to wherever the addressing mode points.
+ * Get the effective memory address. Returns either a mem address between
+ * 0 to 65536, EFF_ACCUM for the accumulator register, or EFF_INV. n would
+ * be the value of the indexing register to use if cc == 10.
  */
-word *e652_effaddr (word opcode);
+int e652_effaddr (word opcode, word n);
+#define EFF_INV   (-1)
+#define EFF_ACCUM (-2)
+
+/*
+ * Read byte from memory.
+ */
+word e652_read (dword addr);
+
+/*
+ * Write byte onto memory.
+ */
+void e652_write (dword addr, word val);
 
 /*
  * Execute instructions.

@@ -24,74 +24,74 @@ void e652_reset (void)
 }
 
 
-word *e652_effaddr (word opcode)
+int e652_effaddr (word opcode, word n)
 {
   word zp_addr, hi, lo; /* declaration only */
   char cc = opcode & 0x3;
   char bbb = (opcode >> 2) & 0x7;
   if (cc == 1) goto cc01;
   if (cc == 2) goto cc10;
-  return 0; /* NULL */
+  return EFF_INV;
 
 cc01:
   switch (bbb) {
-    case A1_INDX:
-      zp_addr = (E.m[E.PC++] + E.X) & 0xff;
-      lo = E.m[ZPAGE + zp_addr];
-      hi = E.m[ZPAGE + ((zp_addr + 1) & 0xff)];
-      return &E.m[lo | hi << 8];
-    case A1_ZPG:
-      return &E.m[ZPAGE + E.m[E.PC++]];
-    case A1_IMM:
-      return &E.m[E.PC++];
-    case A1_ABS:
-      lo = E.m[E.PC++];
-      hi = E.m[E.PC++];
-      return &E.m[lo | hi << 8];
-    case A1_INDY:
-      zp_addr = (E.m[E.PC++] + E.Y) & 0xff;
-      lo = E.m[ZPAGE + zp_addr];
-      hi = E.m[ZPAGE + ((zp_addr + 1) & 0xff)];
-      return &E.m[lo | hi << 8];
-    case A1_ZPGX:
-      return &E.m[ZPAGE + ((E.m[E.PC++] + E.X) & 0xff)];
-    case A1_ABSY:
-      lo = E.m[E.PC++];
-      hi = E.m[E.PC++];
-      return &E.m[((lo | hi << 8) + E.Y) & 0xffff];
-    case A1_ABSX:
-      lo = E.m[E.PC++];
-      hi = E.m[E.PC++];
-      return &E.m[((lo | hi << 8) + E.X) & 0xffff];
-    default:
-      return 0;
+    case A1_INDX: n = E.X; goto indn;
+    case A1_ZPG:  n = 0;   goto zpgn;
+    case A1_IMM:  /* ~n */ goto imm;
+    case A1_ABS:  n = 0;   goto absn;
+    case A1_INDY: n = E.Y; goto indn;
+    case A1_ZPGX: n = E.X; goto zpgn;
+    case A1_ABSY: n = E.Y; goto absn;
+    case A1_ABSX: n = E.X; goto absn;
+    default: return EFF_INV;
   }
 
 cc10:
   switch (bbb) {
-    case A2_IMM:
-      return &E.m[E.PC++];
-    case A2_ZPG:
-      return &E.m[ZPAGE + E.m[E.PC++]];
-    case A2_ACC:
-      return &E.A;
-    case A2_ABS:
-      lo = E.m[E.PC++];
-      hi = E.m[E.PC++];
-      return &E.m[lo | hi << 8];
-    case A2_ZPGY:
-      return &E.m[ZPAGE + ((E.m[E.PC++] + E.Y) & 0xff)];
-    case A2_ABSY:
-      lo = E.m[E.PC++];
-      hi = E.m[E.PC++];
-      return &E.m[((lo | hi << 8) + E.Y) & 0xffff];
-    case A2_ABSX:
-      lo = E.m[E.PC++];
-      hi = E.m[E.PC++];
-      return &E.m[((lo | hi << 8) + E.X) & 0xffff];
-    default:
-      return 0;
+    case A2_IMM:  /* ~n */ goto imm;
+    case A2_ZPG:  n = 0;   goto zpgn;
+    case A2_ACC:  /* ~n */ goto acc;
+    case A2_ABS:  n = 0;   goto absn;
+    case A2_ZPGN:          goto zpgn;
+    case A2_ABSN:          goto absn;
+    default: return EFF_INV;
   }
+
+imm:
+  return (E.PC++) & MMAX;
+acc:
+  return EFF_ACCUM;
+
+/* zeropage addressing */
+zpgn:
+  return (ZPAGE + ((e652_read(E.PC++) + n) & 0xff)) & MMAX;
+
+/* absolute addressing */
+absn:
+  lo = e652_read(E.PC++);
+  hi = e652_read(E.PC++);
+  return ((lo | hi << 8) + n) & MMAX;
+
+/* indirect addressing */
+indn:
+  zp_addr = (e652_read(E.PC++) + n) & 0xff;
+  lo = e652_read(ZPAGE + zp_addr);
+  hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
+  return (lo | hi << 8) & MMAX;
+}
+
+
+word e652_read (dword addr)
+{
+  /* TODO: add hooks */
+  return E.m[addr & MMAX];
+}
+
+
+void e652_write (dword addr, word val)
+{
+  /* TODO: add hooks */
+  E.m[addr & MMAX] = val;
 }
 
 
@@ -116,7 +116,7 @@ br:
   goto br;
 
 I_LDA:
-  E.A = *e652_effaddr(opcode);
+  E.A = E.m[e652_effaddr(opcode, 0)];
   Pset(EZ, E.A == 0);
   Pset(EN, E.A >> 7);
   goto br;
