@@ -9,7 +9,7 @@ CWARNS= \
   -Wmissing-declarations \
   # -pedantic
 
-MYCFLAGS= $(CWARNS) -std=c99
+MYCFLAGS= $(CWARNS) -std=gnu99
 MYLDFLAGS=
 
 CC= gcc
