@@ -109,6 +109,14 @@ int e652_exec (void)
   dtab[0xB9] = &&I_LDA;
   dtab[0xA1] = &&I_LDA;
   dtab[0xB1] = &&I_LDA;
+
+  /* LDX */
+  dtab[0xA2] = &&I_LDX;
+  dtab[0xA6] = &&I_LDX;
+  dtab[0xB6] = &&I_LDX;
+  dtab[0xAE] = &&I_LDX;
+  dtab[0xBE] = &&I_LDX;
+
 br:
   opcode = nextpc();
   if (dtab[opcode])
@@ -116,7 +124,13 @@ br:
   goto br;
 
 I_LDA:
-  E.A = E.m[e652_effaddr(opcode, 0)];
+  E.A = e652_read(e652_effaddr(opcode, 0));
+  Pset(EZ, E.A == 0);
+  Pset(EN, E.A >> 7);
+  goto br;
+
+I_LDX:
+  E.X = e652_read(e652_effaddr(opcode, 0));
   Pset(EZ, E.A == 0);
   Pset(EN, E.A >> 7);
   goto br;
