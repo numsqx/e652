@@ -65,7 +65,7 @@ int e652_exec (void)
 {
   word opcode;
   static void *dtab[256] = {
-    [0 ... 255] = &&unknown,
+    [0 ... 255] = &&I_NOP,
     #ifdef __clang__
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Woverride-init"
@@ -73,6 +73,9 @@ int e652_exec (void)
 
     /* BRK */
     [0x00] = &&I_BRK,
+
+    /* NOP: cc=10 */
+    [0xEA] = &&I_NOP, /* NOP */
 
     /* LDA: cc=01 */
     [0xA9] = &&I_LDA, /* IMM */
@@ -108,7 +111,7 @@ int e652_exec (void)
     #endif
   };
 
-unknown:
+I_NOP:
   goto nextinst();
 
 I_BRK:
