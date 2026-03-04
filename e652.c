@@ -93,6 +93,16 @@ int e652_exec (void)
     [0x9D] = &&I_STA, /* ABSX */
     [0x99] = &&I_STA, /* ABSY */
 
+    /* AND: cc=01 */
+    [0x29] = &&I_AND, /* IMM */
+    [0x2D] = &&I_AND, /* ABS */
+    [0x25] = &&I_AND, /* ZPG */
+    [0x21] = &&I_AND, /* INDX */
+    [0x31] = &&I_AND, /* INDY */
+    [0x35] = &&I_AND, /* ZPGX */
+    [0x3D] = &&I_AND, /* ABSX */
+    [0x39] = &&I_AND, /* ABSY */
+
     #ifdef __clang__
     #pragma clang diagnostic pop
     #endif
@@ -113,5 +123,11 @@ I_LDA:
 
 I_STA:
   e652_write(e652_effaddr01(opcode), E.A);
+  goto nextinst();
+
+I_AND:
+  E.A &= e652_read(e652_effaddr01(opcode));
+  Pset(EZ, E.A == 0);
+  Pset(EN, E.A >> 7);
   goto nextinst();
 }
