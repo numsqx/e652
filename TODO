@@ -1,0 +1,3 @@
+indx and indy are prefix and postfix
+ensure wraparound correctness
+implement more cc01 opcodes
