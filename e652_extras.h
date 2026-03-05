@@ -52,15 +52,27 @@ static inline dword reslv_absn (word n)
 }
 
 /*
- * Resolve the effective address with indirect addressing.
+ * Resolve the effective address of an indirect X-indexed address.
  */
-static inline dword reslv_indn (word n)
+static inline dword reslv_indx (void)
 {
   word zp_addr, lo, hi;
-  zp_addr = (e652_read(E.PC++) + n) & 0xff;
+  zp_addr = (e652_read(E.PC++) + E.X) & 0xff;
   lo = e652_read(ZPAGE + zp_addr);
   hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
   return (lo | hi << 8) & MMAX;
+}
+
+/*
+ * Resolve the effective address of an indirect Y-indexed address.
+ */
+static inline dword reslv_indy (void)
+{
+  word zp_addr, lo, hi;
+  zp_addr = e652_read(E.PC++) & 0xff;
+  lo = e652_read(ZPAGE + zp_addr);
+  hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
+  return ((lo | hi << 8) + E.Y) & MMAX;
 }
 
 #endif
