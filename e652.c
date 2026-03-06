@@ -58,19 +58,17 @@ void e652_write (dword addr, word val)
 }
 
 
-#define nextinst() *dtab[opcode = nextpc()]
-
 #define updateZN(v) do { \
     Pset(EZ, (v) == 0); \
     Pset(EN, ((v) & 0x80) != 0); \
   } while (0)
 
 
-int e652_exec (void)
+int e652_execnext (void)
 {
   word opcode;
   static void *dtab[256] = {
-    [0 ... 255] = &&I_NOP,
+    [0 ... 255] = &&illegal,
     #ifdef __clang__
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Woverride-init"
@@ -126,8 +124,13 @@ int e652_exec (void)
     #endif
   };
 
+  goto *dtab[opcode = nextpc()];
+
+illegal:
+  return H_ILL;
+
 I_NOP:
-  goto nextinst();
+  return H_OK;
 
 I_BRK:
   /* TODO: real implementation */
@@ -136,19 +139,19 @@ I_BRK:
 I_LDA:
   E.A = e652_read(e652_effaddr01(opcode));
   updateZN(E.A);
-  goto nextinst();
+  return H_OK;
 
 I_STA:
   e652_write(e652_effaddr01(opcode), E.A);
-  goto nextinst();
+  return H_OK;
 
 I_AND:
   E.A &= e652_read(e652_effaddr01(opcode));
   updateZN(E.A);
-  goto nextinst();
+  return H_OK;
 
 I_ORA:
   E.A |= e652_read(e652_effaddr01(opcode));
   updateZN(E.A);
-  goto nextinst();
+  return H_OK;
 }

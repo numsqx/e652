@@ -3,6 +3,11 @@
 #include "e652.h"
 
 /*
+ * Execution loop.
+ */
+int exec_loop (void);
+
+/*
  * Just load the ROM anywhere in memory.
  */
 int loadrom (word *mem, int offset, char *path);
@@ -30,10 +35,20 @@ int main (int argc, char **argv)
     return -1;
   E.m = emu_mem;
   e652_reset();
-  int v = e652_exec();
-  if (v == H_DBUG)
-    dump_state();
+  exec_loop();
   return 0;
+}
+
+int exec_loop (void)
+{
+  int v;
+  for (;;) {
+    v = e652_execnext();
+    if (v == H_DBUG) {
+      dump_state();
+      return v;
+    }
+  }
 }
 
 

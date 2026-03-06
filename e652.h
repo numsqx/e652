@@ -80,10 +80,11 @@ word e652_read (dword addr);
 void e652_write (dword addr, word val);
 
 /*
- * Execute instructions. Returns the halt reason.
+ * Execute next instruction. Returns the current state.
  */
-int e652_exec (void);
-#define H_UNK     (0)   /* Unknown */
+int e652_execnext (void);
+#define H_OK      (0)   /* Ok */
 #define H_DBUG    (1)   /* Debug */
+#define H_ILL     (2)   /* Illegal instruction */
 
 #endif
