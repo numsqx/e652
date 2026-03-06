@@ -1,21 +1,21 @@
 val   %0   %1   %2   %3   %4   %5   %6   %7   %8   %9   %A   %B   %C   %D   %E   %F
 
  0%  BRK  ORA                 ORA                 ORA                 ORA
- 1%       ORA                 ORA                 ORA                 ORA
+ 1%       ORA                 ORA            CLC  ORA                 ORA
  2%       AND                 AND                 AND                 AND
- 3%       AND                 AND                 AND                 AND
+ 3%       AND                 AND            SEC  AND                 AND
  4%
- 5%
+ 5%                                          CLI
  6%
- 7%
+ 7%                                          SEI
  8%       STA                 STA                                     STA
  9%       STA                 STA                 STA                 STA
  A%       LDA                 LDA                 LDA                 LDA
- B%       LDA                 LDA                 LDA                 LDA
+ B%       LDA                 LDA            CLV  LDA                 LDA
  C%
- D%
+ D%                                          CLD
  E%                                                    NOP
- F%
+ F%                                          SED
 
  cc   00   01   10   11   00   01   10   11   00   01   10   11   00   01   10   11
 
