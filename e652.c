@@ -60,6 +60,11 @@ void e652_write (dword addr, word val)
 
 #define nextinst() *dtab[opcode = nextpc()]
 
+#define updateZN(v) do { \
+    Pset(EZ, (v) == 0); \
+    Pset(EN, ((v) & 0x80) != 0); \
+  } while (0)
+
 
 int e652_exec (void)
 {
@@ -106,6 +111,16 @@ int e652_exec (void)
     [0x3D] = &&I_AND, /* ABSX */
     [0x39] = &&I_AND, /* ABSY */
 
+    /* ORA: cc=01 */
+    [0x09] = &&I_ORA, /* IMM */
+    [0x0D] = &&I_ORA, /* ABS */
+    [0x05] = &&I_ORA, /* ZPG */
+    [0x01] = &&I_ORA, /* INDX */
+    [0x11] = &&I_ORA, /* INDY */
+    [0x15] = &&I_ORA, /* ZPGX */
+    [0x1D] = &&I_ORA, /* ABSX */
+    [0x19] = &&I_ORA, /* ABSY */
+
     #ifdef __clang__
     #pragma clang diagnostic pop
     #endif
@@ -120,8 +135,7 @@ I_BRK:
 
 I_LDA:
   E.A = e652_read(e652_effaddr01(opcode));
-  Pset(EZ, E.A == 0);
-  Pset(EN, E.A >> 7);
+  updateZN(E.A);
   goto nextinst();
 
 I_STA:
@@ -130,7 +144,11 @@ I_STA:
 
 I_AND:
   E.A &= e652_read(e652_effaddr01(opcode));
-  Pset(EZ, E.A == 0);
-  Pset(EN, E.A >> 7);
+  updateZN(E.A);
+  goto nextinst();
+
+I_ORA:
+  E.A |= e652_read(e652_effaddr01(opcode));
+  updateZN(E.A);
   goto nextinst();
 }
