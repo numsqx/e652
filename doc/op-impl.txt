@@ -1,7 +1,7 @@
 val   %0   %1   %2   %3   %4   %5   %6   %7   %8   %9   %A   %B   %C   %D   %E   %F
 
- 0%  BRK
- 1%
+ 0%  BRK  ORA                 ORA                 ORA                 ORA
+ 1%       ORA                 ORA                 ORA                 ORA
  2%       AND                 AND                 AND                 AND
  3%       AND                 AND                 AND                 AND
  4%
@@ -14,7 +14,7 @@ val   %0   %1   %2   %3   %4   %5   %6   %7   %8   %9   %A   %B   %C   %D   %E  
  B%       LDA                 LDA                 LDA                 LDA
  C%
  D%
- E%
+ E%                                                    NOP
  F%
 
  cc   00   01   10   11   00   01   10   11   00   01   10   11   00   01   10   11
