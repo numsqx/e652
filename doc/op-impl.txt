@@ -4,8 +4,8 @@ val   %0   %1   %2   %3   %4   %5   %6   %7   %8   %9   %A   %B   %C   %D   %E  
  1%       ORA                 ORA            CLC  ORA                 ORA
  2%       AND                 AND                 AND                 AND
  3%       AND                 AND            SEC  AND                 AND
- 4%
- 5%                                          CLI
+ 4%       EOR                 EOR                 EOR                 EOR
+ 5%       EOR                 EOR            CLI  EOR                 EOR
  6%
  7%                                          SEI
  8%       STA                 STA                                     STA

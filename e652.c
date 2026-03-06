@@ -128,6 +128,16 @@ int e652_execnext (void)
     [0x1D] = &&I_ORA, /* ABSX */
     [0x19] = &&I_ORA, /* ABSY */
 
+    /* EOR: cc=01 */
+    [0x49] = &&I_EOR, /* IMM */
+    [0x4D] = &&I_EOR, /* ABS */
+    [0x45] = &&I_EOR, /* ZPG */
+    [0x41] = &&I_EOR, /* INDX */
+    [0x51] = &&I_EOR, /* INDY */
+    [0x55] = &&I_EOR, /* ZPGX */
+    [0x5D] = &&I_EOR, /* ABSX */
+    [0x59] = &&I_EOR, /* ABSY */
+
     #ifdef __clang__
     #pragma clang diagnostic pop
     #endif
@@ -189,6 +199,11 @@ I_AND:
 
 I_ORA:
   E.A |= e652_read(e652_effaddr01(opcode));
+  updateZN(E.A);
+  return H_OK;
+
+I_EOR:
+  E.A ^= e652_read(e652_effaddr01(opcode));
   updateZN(E.A);
   return H_OK;
 }
