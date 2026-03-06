@@ -67,6 +67,7 @@ void e652_write (dword addr, word val)
 int e652_execnext (void)
 {
   word opcode;
+  word M;
   static void *dtab[256] = {
     [0 ... 255] = &&illegal,
     #ifdef __clang__
@@ -138,6 +139,16 @@ int e652_execnext (void)
     [0x5D] = &&I_EOR, /* ABSX */
     [0x59] = &&I_EOR, /* ABSY */
 
+    /* CMP: cc=01 */
+    [0xC9] = &&I_CMP, /* IMM */
+    [0xCD] = &&I_CMP, /* ABS */
+    [0xC5] = &&I_CMP, /* ZPG */
+    [0xC1] = &&I_CMP, /* INDX */
+    [0xD1] = &&I_CMP, /* INDY */
+    [0xD5] = &&I_CMP, /* ZPGX */
+    [0xDD] = &&I_CMP, /* ABSX */
+    [0xD9] = &&I_CMP, /* ABSY */
+
     #ifdef __clang__
     #pragma clang diagnostic pop
     #endif
@@ -205,5 +216,12 @@ I_ORA:
 I_EOR:
   E.A ^= e652_read(e652_effaddr01(opcode));
   updateZN(E.A);
+  return H_OK;
+
+I_CMP:
+  M = e652_read(e652_effaddr01(opcode));
+  Pset(EC, E.A >= M);
+  Pset(EZ, E.A == M);
+  Pset(EN, ((E.A - M) & 0x80) != 0);
   return H_OK;
 }
