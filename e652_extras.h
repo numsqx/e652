@@ -54,7 +54,7 @@ static inline dword reslv_absn (word n)
 /*
  * Resolve the effective address of an indirect X-indexed address.
  */
-static inline dword reslv_indx (void)
+static inline dword reslv_xind (void)
 {
   word zp_addr, lo, hi;
   zp_addr = (e652_read(E.PC++) + E.X) & 0xff;

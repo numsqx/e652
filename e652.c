@@ -31,7 +31,7 @@ int e652_effaddr01 (word opcode)
   char bbb = (opcode >> 2) & 0x7;
   if (cc != 1) return -1;
   switch (bbb) {
-    case A1_INDX: return reslv_indx();
+    case A1_INDX: return reslv_xind();
     case A1_ZPG:  return reslv_zpgn(0);
     case A1_IMM:  return reslv_imm();
     case A1_ABS:  return reslv_absn(0);
