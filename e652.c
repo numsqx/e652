@@ -25,7 +25,7 @@ void e652_reset (void)
 }
 
 
-int e652_effaddr01 (word opcode)
+int e652_effaddr01 (byte opcode)
 {
   char cc = opcode & 0x3;
   char bbb = (opcode >> 2) & 0x7;
@@ -44,14 +44,14 @@ int e652_effaddr01 (word opcode)
 }
 
 
-word e652_read (dword addr)
+byte e652_read (word addr)
 {
   /* TODO: add hooks */
   return E.m[addr & MMAX];
 }
 
 
-void e652_write (dword addr, word val)
+void e652_write (word addr, byte val)
 {
   /* TODO: add hooks */
   E.m[addr & MMAX] = val;
@@ -66,8 +66,8 @@ void e652_write (dword addr, word val)
 
 int e652_execnext (void)
 {
-  word opcode;
-  word M;
+  byte opcode;
+  byte M;
   static void *dtab[256] = {
     [0 ... 255] = &&illegal,
     #ifdef __clang__

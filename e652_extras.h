@@ -27,7 +27,7 @@
 /*
  * Resolve the effective address of an immediate.
  */
-static inline dword reslv_imm (void)
+static inline word reslv_imm (void)
 {
   return E.PC++;
 }
@@ -35,7 +35,7 @@ static inline dword reslv_imm (void)
 /*
  * Resolve the effective address of an index in zeropage.
  */
-static inline dword reslv_zpgn (word n)
+static inline word reslv_zpgn (byte n)
 {
   return ZPAGE + ((e652_read(E.PC++) + n) & 0xff);
 }
@@ -43,9 +43,9 @@ static inline dword reslv_zpgn (word n)
 /*
  * Resolve the effective address of an absolute addr + index.
  */
-static inline dword reslv_absn (word n)
+static inline word reslv_absn (byte n)
 {
-  word lo, hi;
+  byte lo, hi;
   lo = e652_read(E.PC++);
   hi = e652_read(E.PC++);
   return ((lo | hi << 8) + n) & MMAX;
@@ -54,9 +54,9 @@ static inline dword reslv_absn (word n)
 /*
  * Resolve the effective address of an indirect X-indexed address.
  */
-static inline dword reslv_xind (void)
+static inline word reslv_xind (void)
 {
-  word zp_addr, lo, hi;
+  byte zp_addr, lo, hi;
   zp_addr = (e652_read(E.PC++) + E.X) & 0xff;
   lo = e652_read(ZPAGE + zp_addr);
   hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
@@ -66,9 +66,9 @@ static inline dword reslv_xind (void)
 /*
  * Resolve the effective address of an indirect Y-indexed address.
  */
-static inline dword reslv_indy (void)
+static inline word reslv_indy (void)
 {
-  word zp_addr, lo, hi;
+  byte zp_addr, lo, hi;
   zp_addr = e652_read(E.PC++) & 0xff;
   lo = e652_read(ZPAGE + zp_addr);
   hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));

@@ -12,19 +12,19 @@
 #include <stdint.h>
 
 
-typedef uint8_t word;
-typedef uint16_t dword;
+typedef uint8_t byte;
+typedef uint16_t word;
 
 /*
  * e652 emulation context.
  */
 struct e652 {
-  word *m;        /* 64KB */
-  dword PC;       /* Program counter. */
-  word A;         /* Accumulator register. */
-  word X, Y;      /* Index (general) regs. */
-  word P;         /* Status register. */
-  word S;         /* Stack pointer. */
+  byte *m;        /* 64KB */
+  word PC;        /* Program counter. */
+  byte A;         /* Accumulator register. */
+  byte X, Y;      /* Index (general) regs. */
+  byte P;         /* Status register. */
+  byte S;         /* Stack pointer. */
 };
 
 extern struct e652 E;
@@ -67,17 +67,17 @@ void e652_reset (void);
  * Get the effective memory address. Returns a mem address between 0 to 65536.
  * Returns -1 on error. Works only for opcodes with cc == 01.
  */
-int e652_effaddr01 (word opcode);
+int e652_effaddr01 (byte opcode);
 
 /*
  * Read byte from memory.
  */
-word e652_read (dword addr);
+byte e652_read (word addr);
 
 /*
  * Write byte onto memory.
  */
-void e652_write (dword addr, word val);
+void e652_write (word addr, byte val);
 
 /*
  * Execute next instruction. Returns the current state.

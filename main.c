@@ -10,7 +10,7 @@ int exec_loop (void);
 /*
  * Just load the ROM anywhere in memory.
  */
-int loadrom (word *mem, int offset, char *path);
+int loadrom (byte *mem, int offset, char *path);
 
 /*
  * Print the last value of registers.
@@ -20,7 +20,7 @@ void dump_state (void);
 /*
  * Memory.
  */
-static word emu_mem[MLEN];
+static byte emu_mem[MLEN];
 
 
 
@@ -52,7 +52,7 @@ int exec_loop (void)
 }
 
 
-int loadrom (word *mem, int offset, char *path)
+int loadrom (byte *mem, int offset, char *path)
 {
   FILE *fp = fopen(path, "rb");
   if (!fp) {
