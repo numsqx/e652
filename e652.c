@@ -80,6 +80,15 @@ int e652_execnext (void)
     /* NOP: cc=10 */
     [0xEA] = &&I_NOP, /* NOP */
 
+    /* status flag stuff */
+    [0x38] = &&I_SEC,
+    [0xF8] = &&I_SED,
+    [0x78] = &&I_SEI,
+    [0x18] = &&I_CLC,
+    [0xD8] = &&I_CLD,
+    [0x58] = &&I_CLI,
+    [0xB8] = &&I_CLV,
+
     /* LDA: cc=01 */
     [0xA9] = &&I_LDA, /* IMM */
     [0xAD] = &&I_LDA, /* ABS */
@@ -135,6 +144,34 @@ I_NOP:
 I_BRK:
   /* TODO: real implementation */
   return H_DBUG;
+
+I_SEC:
+  Pset(EC, 1);
+  return H_OK;
+
+I_SED:
+  Pset(ED, 1);
+  return H_OK;
+
+I_SEI:
+  Pset(EI, 1);
+  return H_OK;
+
+I_CLC:
+  Pset(EC, 0);
+  return H_OK;
+
+I_CLD:
+  Pset(ED, 0);
+  return H_OK;
+
+I_CLI:
+  Pset(EI, 0);
+  return H_OK;
+
+I_CLV:
+  Pset(EV, 0);
+  return H_OK;
 
 I_LDA:
   E.A = e652_read(e652_effaddr01(opcode));
