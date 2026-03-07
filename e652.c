@@ -108,6 +108,12 @@ int e652_execnext (void)
     [0x50] = &&I_BVC,
     [0x70] = &&I_BVS,
 
+    /* stack access */
+    [0x48] = &&I_PHA, /* push A */
+    [0x08] = &&I_PHP, /* push P */
+    [0x68] = &&I_PLA, /* pull (pop) to A */
+    [0x28] = &&I_PLP, /* pull (pop) to P */
+
     /* LDA: cc=01 */
     [0xA9] = &&I_LDA, /* IMM */
     [0xAD] = &&I_LDA, /* ABS */
@@ -203,6 +209,22 @@ I_NOP:
 I_BRK:
   /* TODO: real implementation */
   return H_DBUG;
+
+I_PHA:
+  push(E.A);
+  return H_OK;
+
+I_PHP:
+  push(E.P);
+  return H_OK;
+
+I_PLA:
+  E.A = pop();
+  return H_OK;
+
+I_PLP:
+  E.P = pop();
+  return H_OK;
 
 I_SEC:
   Pset(EC, 1);
