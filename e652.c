@@ -24,6 +24,18 @@ static inline word reslv_rel (void);
 static inline word reslv_indir (void);
 
 
+/* opcode table element struct */
+struct opinfo {
+  char *mnemonic;
+  char addr_mode;
+  char length;
+  char base_cycle;
+};
+
+static struct opinfo ops[256];
+
+
+
 void e652_reset (void)
 {
   E.PC = b2(V_RES); /* reset vector */
@@ -41,14 +53,14 @@ int e652_effaddr01 (byte opcode)
   char bbb = (opcode >> 2) & 0x7;
   if (cc != 1) return -1;
   switch (bbb) {
-    case A1_INDX: return reslv_xind();
-    case A1_ZPG:  return reslv_zpgn(0);
-    case A1_IMM:  return reslv_imm();
-    case A1_ABS:  return reslv_absn(0);
-    case A1_INDY: return reslv_indy();
-    case A1_ZPGX: return reslv_zpgn(E.X);
-    case A1_ABSY: return reslv_absn(E.Y);
-    case A1_ABSX: return reslv_absn(E.X);
+    case A_INDX: return reslv_xind();
+    case A_ZPG:  return reslv_zpgn(0);
+    case A_IMM:  return reslv_imm();
+    case A_ABS:  return reslv_absn(0);
+    case A_INDY: return reslv_indy();
+    case A_ZPGX: return reslv_zpgn(E.X);
+    case A_ABSY: return reslv_absn(E.Y);
+    case A_ABSX: return reslv_absn(E.X);
     default: return -1;
   }
 }
@@ -423,3 +435,13 @@ static inline word reslv_indir (void)
   hi = e652_read((rhi << 8) | ((rlo + 1) & 0xff));
   return (lo | hi << 8) & MMAX;
 }
+
+
+
+#define OP(O,M,A,L,C) \
+  [O] = (struct opinfo){(#M),(A),(L),(C)}
+
+static struct opinfo ops[256] = {
+  OP(0xEA, nop, A_NONE, 1, 2),
+  /* TODO: migrate stuff here */
+};

@@ -59,15 +59,20 @@ extern struct e652 E;
 #define pop() (e652_read(SPAGE + ++E.S)) /* Stack pop */
 
 /* addressing modes (bbb) for cc == 01 */
-#define A1_INDX (0) /* (indirect,X) */
-#define A1_ZPG (1) /* zeropage */
-#define A1_IMM (2) /* immediate */
-#define A1_ABS (3) /* absolute */
-#define A1_INDY (4) /* (indirect),Y */
-#define A1_ZPGX (5) /* zeropage,X */
-#define A1_ABSY (6) /* absolute,Y */
-#define A1_ABSX (7) /* absolute,X */
-
+#define A_INDX    (0)  /* (indirect,X) */
+#define A_ZPG     (1)  /* zeropage */
+#define A_IMM     (2)  /* immediate */
+#define A_ABS     (3)  /* absolute */
+#define A_INDY    (4)  /* (indirect),Y */
+#define A_ZPGX    (5)  /* zeropage,X */
+#define A_ABSY    (6)  /* absolute,Y */
+#define A_ABSX    (7)  /* absolute,X */
+/* other addressing modes (outside cc == 01) */
+#define A_REL     (8)  /* pc-relative */
+#define A_IND     (9)  /* indirect */
+#define A_NONE    (10) /* none/implied */
+#define A_ACC     (11) /* accumulator */
+#define A_ZPGY    (12) /* zeropage,Y */
 
 
 /*
