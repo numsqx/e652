@@ -90,6 +90,16 @@ int e652_execnext (void)
     [0x58] = &&I_CLI,
     [0xB8] = &&I_CLV,
 
+    /* relative branch stuff */
+    [0x90] = &&I_BCC,
+    [0xB0] = &&I_BCS,
+    [0xF0] = &&I_BEQ,
+    [0xD0] = &&I_BNE,
+    [0x30] = &&I_BMI,
+    [0x10] = &&I_BPL,
+    [0x50] = &&I_BVC,
+    [0x70] = &&I_BVS,
+
     /* LDA: cc=01 */
     [0xA9] = &&I_LDA, /* IMM */
     [0xAD] = &&I_LDA, /* ABS */
@@ -212,6 +222,59 @@ I_CLI:
 
 I_CLV:
   Pset(EV, 0);
+  return H_OK;
+
+I_BCC:
+  M = e652_read(reslv_imm());
+  if (!Phas(EC))
+    goto relbr;
+  return H_OK;
+
+I_BCS:
+  M = e652_read(reslv_imm());
+  if (Phas(EC))
+    goto relbr;
+  return H_OK;
+
+I_BEQ:
+  M = e652_read(reslv_imm());
+  if (Phas(EZ))
+    goto relbr;
+  return H_OK;
+
+I_BNE:
+  M = e652_read(reslv_imm());
+  if (!Phas(EZ))
+    goto relbr;
+  return H_OK;
+
+I_BMI:
+  M = e652_read(reslv_imm());
+  if (Phas(EN))
+    goto relbr;
+  return H_OK;
+
+I_BPL:
+  M = e652_read(reslv_imm());
+  if (!Phas(EN))
+    goto relbr;
+  return H_OK;
+
+I_BVC:
+  M = e652_read(reslv_imm());
+  if (!Phas(EV))
+    goto relbr;
+  return H_OK;
+
+I_BVS:
+  M = e652_read(reslv_imm());
+  if (Phas(EV))
+    goto relbr;
+  return H_OK;
+
+relbr:
+  /* relative branch impl */
+  E.PC += (int8_t)M;
   return H_OK;
 
 I_LDA:

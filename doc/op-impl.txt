@@ -1,21 +1,21 @@
 val   %0   %1   %2   %3   %4   %5   %6   %7   %8   %9   %A   %B   %C   %D   %E   %F
 
  0%  BRK  ORA                 ORA                 ORA                 ORA
- 1%       ORA                 ORA            CLC  ORA                 ORA
+ 1%  BPL  ORA                 ORA            CLC  ORA                 ORA
  2%       AND                 AND                 AND                 AND
- 3%       AND                 AND            SEC  AND                 AND
+ 3%  BMI  AND                 AND            SEC  AND                 AND
  4%       EOR                 EOR                 EOR                 EOR
- 5%       EOR                 EOR            CLI  EOR                 EOR
+ 5%  BVC  EOR                 EOR            CLI  EOR                 EOR
  6%       ADC                 ADC                 ADC                 ADC
- 7%       ADC                 ADC            SEI  ADC                 ADC
+ 7%  BVS  ADC                 ADC            SEI  ADC                 ADC
  8%       STA                 STA                                     STA
- 9%       STA                 STA                 STA                 STA
+ 9%  BCC  STA                 STA                 STA                 STA
  A%       LDA                 LDA                 LDA                 LDA
- B%       LDA                 LDA            CLV  LDA                 LDA
+ B%  BCS  LDA                 LDA            CLV  LDA                 LDA
  C%       CMP                 CMP                 CMP                 CMP
- D%       CMP                 CMP            CLD  CMP                 CMP
+ D%  BNE  CMP                 CMP            CLD  CMP                 CMP
  E%       SBC                 SBC                 SBC  NOP            SBC
- F%       SBC                 SBC            SED  SBC                 SBC
+ F%  BEQ  SBC                 SBC            SED  SBC                 SBC
 
  cc   00   01   10   11   00   01   10   11   00   01   10   11   00   01   10   11
 

@@ -39,6 +39,7 @@ extern struct e652 E;
 #define EC (1<<0)  /* Carry */
 
 #define Pset(f,c) (E.P = (E.P & ~(f)) | ((c) ? (f) : 0)) /* Assigns a flag */
+#define Phas(f) ((E.P & (f)) != 0) /* Is f set? */
 
 #define MLEN (1<<16) /* Length of memory */
 #define MMAX (MLEN-1) /* Max possible address (can be used as a wrap mask) */
