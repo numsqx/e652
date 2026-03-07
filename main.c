@@ -35,6 +35,7 @@ int main (int argc, char **argv)
     return -1;
   E.m = emu_mem;
   e652_reset();
+  E.PC = 0x400;
   exec_loop();
   return 0;
 }
@@ -43,6 +44,8 @@ int exec_loop (void)
 {
   int v;
   for (;;) {
+    printf("%04X: %02x: A=%02X, X=%02X, Y=%02X, S=%02X, P=%02X\n",
+        E.PC, E.m[E.PC], E.A, E.X, E.Y, E.S, E.P);
     v = e652_execnext();
     if (v == H_DBUG) {
       dump_state();
