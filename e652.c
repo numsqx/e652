@@ -59,7 +59,7 @@ void e652_write (word addr, byte val)
 
 
 #define updateZN(v) do { \
-    Pset(EZ, (v) == 0); \
+    Pset(EZ, ((v) & 0xff) == 0); \
     Pset(EN, ((v) & 0x80) != 0); \
   } while (0)
 
@@ -67,7 +67,7 @@ void e652_write (word addr, byte val)
 int e652_execnext (void)
 {
   byte opcode;
-  byte M;
+  int M, R;
   static void *dtab[256] = {
     [0 ... 255] = &&illegal,
     #ifdef __clang__
@@ -149,6 +149,16 @@ int e652_execnext (void)
     [0xDD] = &&I_CMP, /* ABSX */
     [0xD9] = &&I_CMP, /* ABSY */
 
+    /* ADC: cc=01 */
+    [0x69] = &&I_ADC, /* IMM */
+    [0x6D] = &&I_ADC, /* ABS */
+    [0x65] = &&I_ADC, /* ZPG */
+    [0x61] = &&I_ADC, /* INDX */
+    [0x71] = &&I_ADC, /* INDY */
+    [0x75] = &&I_ADC, /* ZPGX */
+    [0x7D] = &&I_ADC, /* ABSX */
+    [0x79] = &&I_ADC, /* ABSY */
+
     #ifdef __clang__
     #pragma clang diagnostic pop
     #endif
@@ -220,8 +230,20 @@ I_EOR:
 
 I_CMP:
   M = e652_read(e652_effaddr01(opcode));
+  R = E.A - M;
+  updateZN(R);
   Pset(EC, E.A >= M);
-  Pset(EZ, E.A == M);
-  Pset(EN, ((E.A - M) & 0x80) != 0);
+  return H_OK;
+
+I_ADC:
+  M = e652_read(e652_effaddr01(opcode));
+  R = E.A + M + ((E.P & EC) ? 1 : 0);
+  updateZN(R);
+  Pset(EC, (R & 0x100) != 0);
+  // if sign of A and M are same, then
+  // R's sign must also be same
+  Pset(EV, (~(E.A ^ M) & (M ^ R) & 0x80) != 0);
+  /* TODO: decimal mode */
+  E.A = R;
   return H_OK;
 }
