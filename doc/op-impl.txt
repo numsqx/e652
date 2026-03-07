@@ -1,12 +1,12 @@
 val   %0   %1   %2   %3   %4   %5   %6   %7   %8   %9   %A   %B   %C   %D   %E   %F
 
- 0%  BRK  ORA                 ORA                 ORA                 ORA
+ 0%  BRK  ORA                 ORA            PHP  ORA                 ORA
  1%  BPL  ORA                 ORA            CLC  ORA                 ORA
- 2%       AND                 AND                 AND                 AND
+ 2%       AND                 AND            PLP  AND                 AND
  3%  BMI  AND                 AND            SEC  AND                 AND
- 4%       EOR                 EOR                 EOR                 EOR
+ 4%       EOR                 EOR            PHA  EOR            JMP  EOR
  5%  BVC  EOR                 EOR            CLI  EOR                 EOR
- 6%       ADC                 ADC                 ADC                 ADC
+ 6%       ADC                 ADC            PLA  ADC            JMP  ADC
  7%  BVS  ADC                 ADC            SEI  ADC                 ADC
  8%       STA                 STA                                     STA
  9%  BCC  STA                 STA                 STA                 STA
