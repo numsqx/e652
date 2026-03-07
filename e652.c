@@ -159,6 +159,16 @@ int e652_execnext (void)
     [0x7D] = &&I_ADC, /* ABSX */
     [0x79] = &&I_ADC, /* ABSY */
 
+    /* SBC: cc=01 */
+    [0xE9] = &&I_SBC, /* IMM */
+    [0xED] = &&I_SBC, /* ABS */
+    [0xE5] = &&I_SBC, /* ZPG */
+    [0xE1] = &&I_SBC, /* INDX */
+    [0xF1] = &&I_SBC, /* INDY */
+    [0xF5] = &&I_SBC, /* ZPGX */
+    [0xFD] = &&I_SBC, /* ABSX */
+    [0xF9] = &&I_SBC, /* ABSY */
+
     #ifdef __clang__
     #pragma clang diagnostic pop
     #endif
@@ -237,6 +247,7 @@ I_CMP:
 
 I_ADC:
   M = e652_read(e652_effaddr01(opcode));
+_adc_bin:
   R = E.A + M + ((E.P & EC) ? 1 : 0);
   updateZN(R);
   Pset(EC, (R & 0x100) != 0);
@@ -246,4 +257,8 @@ I_ADC:
   /* TODO: decimal mode */
   E.A = R;
   return H_OK;
+
+I_SBC:
+  M = ~e652_read(e652_effaddr01(opcode));
+  goto _adc_bin;
 }
