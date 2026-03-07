@@ -6,8 +6,8 @@ val   %0   %1   %2   %3   %4   %5   %6   %7   %8   %9   %A   %B   %C   %D   %E  
  3%       AND                 AND            SEC  AND                 AND
  4%       EOR                 EOR                 EOR                 EOR
  5%       EOR                 EOR            CLI  EOR                 EOR
- 6%
- 7%                                          SEI
+ 6%       ADC                 ADC                 ADC                 ADC
+ 7%       ADC                 ADC            SEI  ADC                 ADC
  8%       STA                 STA                                     STA
  9%       STA                 STA                 STA                 STA
  A%       LDA                 LDA                 LDA                 LDA
