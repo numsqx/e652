@@ -21,6 +21,7 @@ static inline word reslv_absn (byte n);
 static inline word reslv_xind (void);
 static inline word reslv_indy (void);
 static inline word reslv_rel (void);
+static inline word reslv_indir (void);
 
 
 void e652_reset (void)
@@ -108,6 +109,10 @@ int e652_execnext (void)
     [0x10] = &&I_BPL,
     [0x50] = &&I_BVC,
     [0x70] = &&I_BVS,
+
+    /* unconditional jumps */
+    [0x4C] = &&I_JMP_abs,
+    [0x6C] = &&I_JMP_ind,
 
     /* stack access */
     [0x48] = &&I_PHA, /* push A */
@@ -210,6 +215,14 @@ I_NOP:
 I_BRK:
   /* TODO: real implementation */
   return H_DBUG;
+
+I_JMP_abs:
+  E.PC = reslv_absn(0);
+  return H_OK;
+
+I_JMP_ind:
+  E.PC = reslv_indir();
+  return H_OK;
 
 I_PHA:
   push(E.A);
@@ -361,7 +374,7 @@ static inline word reslv_imm (void)
 
 static inline word reslv_zpgn (byte n)
 {
-  return ZPAGE + ((e652_read(E.PC++) + n) & 0xff);
+  return ZPAGE | ((e652_read(E.PC++) + n) & 0xff);
 }
 
 
@@ -378,8 +391,8 @@ static inline word reslv_xind (void)
 {
   byte zp_addr, lo, hi;
   zp_addr = e652_read(E.PC++) + E.X;
-  lo = e652_read(ZPAGE + ((zp_addr + 0) & 0xff));
-  hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
+  lo = e652_read(ZPAGE | ((zp_addr + 0) & 0xff));
+  hi = e652_read(ZPAGE | ((zp_addr + 1) & 0xff));
   return (lo | hi << 8) & MMAX;
 }
 
@@ -388,8 +401,8 @@ static inline word reslv_indy (void)
 {
   byte zp_addr, lo, hi;
   zp_addr = e652_read(E.PC++);
-  lo = e652_read(ZPAGE + ((zp_addr + 0) & 0xff));
-  hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
+  lo = e652_read(ZPAGE | ((zp_addr + 0) & 0xff));
+  hi = e652_read(ZPAGE | ((zp_addr + 1) & 0xff));
   return ((lo | hi << 8) + E.Y) & MMAX;
 }
 
@@ -398,4 +411,15 @@ static inline word reslv_rel (void)
 {
   int8_t offset = e652_read(E.PC++);
   return E.PC + offset;
+}
+
+
+static inline word reslv_indir (void)
+{
+  byte rlo, rhi, lo, hi;
+  rlo = e652_read(E.PC++);
+  rhi = e652_read(E.PC++);
+  lo = e652_read((rhi << 8) | ((rlo + 0) & 0xff));
+  hi = e652_read((rhi << 8) | ((rlo + 1) & 0xff));
+  return (lo | hi << 8) & MMAX;
 }
