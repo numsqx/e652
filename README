@@ -1,4 +1,4 @@
-E652 -- A 6502 emulator.
+E652 -- A 6502 emulator (cpu only).
 
   WORK-IN-PROGRESS
   Just for fun.
@@ -11,7 +11,7 @@ To build:
 
 Useful resources:
 
-+ https://github.com/Klaus2m5/6502_65C02_functional_tests
++ https://github.com/amb5l/6502_65C02_functional_tests
 + https://github.com/cc65/cc65
 
 License
