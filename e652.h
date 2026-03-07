@@ -58,6 +58,17 @@ extern struct e652 E;
 #define push(v) (e652_write(SPAGE + E.S--, (v))) /* Stack push */
 #define pop() (e652_read(SPAGE + ++E.S)) /* Stack pop */
 
+/* addressing modes (bbb) for cc == 01 */
+#define A1_INDX (0) /* (indirect,X) */
+#define A1_ZPG (1) /* zeropage */
+#define A1_IMM (2) /* immediate */
+#define A1_ABS (3) /* absolute */
+#define A1_INDY (4) /* (indirect),Y */
+#define A1_ZPGX (5) /* zeropage,X */
+#define A1_ABSY (6) /* absolute,Y */
+#define A1_ABSX (7) /* absolute,X */
+
+
 
 /*
  * Initialize a 6502 emulation context.

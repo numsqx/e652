@@ -7,11 +7,19 @@
  */
 
 #include "e652.h"
-#include "e652_extras.h"
 
 
 /* Static definition of E652 execution context. */
 struct e652 E;
+
+/*
+ * Address resolvers. Replace `n` with X, Y, or 0, accordingly.
+ */
+static inline word reslv_imm (void);
+static inline word reslv_zpgn (byte n);
+static inline word reslv_absn (byte n);
+static inline word reslv_xind (void);
+static inline word reslv_indy (void);
 
 
 void e652_reset (void)
@@ -184,7 +192,7 @@ int e652_execnext (void)
     #endif
   };
 
-  goto *dtab[opcode = nextpc()];
+  goto *dtab[opcode = e652_read(E.PC++)];
 
 illegal:
   return H_ILL;
@@ -311,7 +319,7 @@ I_CMP:
 I_ADC:
   M = e652_read(e652_effaddr01(opcode));
 _adc_bin:
-  R = E.A + M + ((E.P & EC) ? 1 : 0);
+  R = E.A + M + Phas(EC);
   updateZN(R);
   Pset(EC, (R & 0x100) != 0);
   // if sign of A and M are same, then
@@ -322,6 +330,47 @@ _adc_bin:
   return H_OK;
 
 I_SBC:
-  M = ~e652_read(e652_effaddr01(opcode));
+  M = ~e652_read(e652_effaddr01(opcode)); /* ~M = -M - 1 */
   goto _adc_bin;
+}
+
+
+static inline word reslv_imm (void)
+{
+  return E.PC++;
+}
+
+
+static inline word reslv_zpgn (byte n)
+{
+  return ZPAGE + ((e652_read(E.PC++) + n) & 0xff);
+}
+
+
+static inline word reslv_absn (byte n)
+{
+  byte lo, hi;
+  lo = e652_read(E.PC++);
+  hi = e652_read(E.PC++);
+  return ((lo | hi << 8) + n) & MMAX;
+}
+
+
+static inline word reslv_xind (void)
+{
+  byte zp_addr, lo, hi;
+  zp_addr = e652_read(E.PC++) + E.X;
+  lo = e652_read(ZPAGE + ((zp_addr + 0) & 0xff));
+  hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
+  return (lo | hi << 8) & MMAX;
+}
+
+
+static inline word reslv_indy (void)
+{
+  byte zp_addr, lo, hi;
+  zp_addr = e652_read(E.PC++);
+  lo = e652_read(ZPAGE + ((zp_addr + 0) & 0xff));
+  hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
+  return ((lo | hi << 8) + E.Y) & MMAX;
 }
