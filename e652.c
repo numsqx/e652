@@ -20,6 +20,7 @@ static inline word reslv_zpgn (byte n);
 static inline word reslv_absn (byte n);
 static inline word reslv_xind (void);
 static inline word reslv_indy (void);
+static inline word reslv_rel (void);
 
 
 void e652_reset (void)
@@ -255,56 +256,51 @@ I_CLV:
   return H_OK;
 
 I_BCC:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (!Phas(EC))
-    goto relbr;
+    E.PC = M;
   return H_OK;
 
 I_BCS:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (Phas(EC))
-    goto relbr;
+    E.PC = M;
   return H_OK;
 
 I_BEQ:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (Phas(EZ))
-    goto relbr;
+    E.PC = M;
   return H_OK;
 
 I_BNE:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (!Phas(EZ))
-    goto relbr;
+    E.PC = M;
   return H_OK;
 
 I_BMI:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (Phas(EN))
-    goto relbr;
+    E.PC = M;
   return H_OK;
 
 I_BPL:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (!Phas(EN))
-    goto relbr;
+    E.PC = M;
   return H_OK;
 
 I_BVC:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (!Phas(EV))
-    goto relbr;
+    E.PC = M;
   return H_OK;
 
 I_BVS:
-  M = e652_read(reslv_imm());
+  M = reslv_rel();
   if (Phas(EV))
-    goto relbr;
-  return H_OK;
-
-relbr:
-  /* relative branch impl */
-  E.PC += (int8_t)M;
+    E.PC = M;
   return H_OK;
 
 I_LDA:
@@ -395,4 +391,11 @@ static inline word reslv_indy (void)
   lo = e652_read(ZPAGE + ((zp_addr + 0) & 0xff));
   hi = e652_read(ZPAGE + ((zp_addr + 1) & 0xff));
   return ((lo | hi << 8) + E.Y) & MMAX;
+}
+
+
+static inline word reslv_rel (void)
+{
+  int8_t offset = e652_read(E.PC++);
+  return E.PC + offset;
 }
