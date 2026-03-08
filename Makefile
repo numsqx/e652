@@ -21,7 +21,7 @@ LDFLAGS= $(MYLDFLAGS)
 
 ## build file names
 
-ALL_C= main.c e652.c
+ALL_C= main.c e652.c disasm.c
 ALL_O= $(ALL_C:.c=.o)
 ALL_D= $(ALL_C:.c=.d)
 ALL_T= e652

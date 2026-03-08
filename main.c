@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "e652.h"
+#include "disasm.h"
 
 /*
  * Execution loop.
@@ -44,8 +45,9 @@ int exec_loop (void)
 {
   int v;
   for (;;) {
-    printf("%04X: %02x: A=%02X, X=%02X, Y=%02X, S=%02X, P=%02X\n",
-        E.PC, E.m[E.PC], E.A, E.X, E.Y, E.S, E.P);
+    printf("A=%02X X=%02X Y=%02X S=%02X P=%02X:   ",
+        E.A, E.X, E.Y, E.S, E.P);
+    print_disasm(E.m + E.PC, E.PC);
     v = e652_execnext();
     if (v == H_DBUG) {
       dump_state();
