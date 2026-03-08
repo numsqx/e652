@@ -1,0 +1,117 @@
+/* OP(opcode, mnemonic, addressing, length, cycles) */
+
+OP(0x00, BRK, A_NONE, 1, 7)
+
+OP(0xEA, NOP, A_NONE, 1, 2)
+
+/* status flag stuff */
+OP(0x38, SEC, A_NONE, 1, 2)
+OP(0xF8, SED, A_NONE, 1, 2)
+OP(0x78, SEI, A_NONE, 1, 2)
+OP(0x18, CLC, A_NONE, 1, 2)
+OP(0xD8, CLD, A_NONE, 1, 2)
+OP(0x58, CLI, A_NONE, 1, 2)
+OP(0xB8, CLV, A_NONE, 1, 2)
+
+/* relative branch stuff
+ * +0 C = branch not taken
+ * +1 C = within page
+ * +2 C = across page
+ */
+OP(0x90, BCC, A_REL, 2, 2 | BR)
+OP(0xB0, BCS, A_REL, 2, 2 | BR)
+OP(0xF0, BEQ, A_REL, 2, 2 | BR)
+OP(0xD0, BNE, A_REL, 2, 2 | BR)
+OP(0x30, BMI, A_REL, 2, 2 | BR)
+OP(0x10, BPL, A_REL, 2, 2 | BR)
+OP(0x50, BVC, A_REL, 2, 2 | BR)
+OP(0x70, BVS, A_REL, 2, 2 | BR)
+
+/* unconditional jumps */
+OP(0x4C, JMP, A_ABS, 3, 3)
+OP(0x6C, JMP, A_IND, 3, 5)
+
+/* stack access */
+OP(0x48, PHA, A_NONE, 1, 3) /* push A */
+OP(0x08, PHP, A_NONE, 1, 3) /* push P */
+OP(0x68, PLA, A_NONE, 1, 4) /* pull (pop) to A */
+OP(0x28, PLP, A_NONE, 1, 4) /* pull (pop) to P */
+
+/* LDA: cc=01 */
+OP(0xA9, LDA, A_IMM,  2, 2)
+OP(0xAD, LDA, A_ABS,  3, 4)
+OP(0xA5, LDA, A_ZPG,  2, 3)
+OP(0xA1, LDA, A_INDX, 2, 6)
+OP(0xB1, LDA, A_INDY, 2, 5 | PL)
+OP(0xB5, LDA, A_ZPGX, 2, 4)
+OP(0xBD, LDA, A_ABSX, 3, 4 | PL)
+OP(0xB9, LDA, A_ABSY, 3, 4 | PL)
+
+/* STA: cc=01 */
+OP(0x8D, STA, A_ABS,  3, 4)
+OP(0x85, STA, A_ZPG,  2, 3)
+OP(0x81, STA, A_INDX, 2, 6)
+OP(0x91, STA, A_INDY, 2, 6)
+OP(0x95, STA, A_ZPGX, 2, 4)
+OP(0x9D, STA, A_ABSX, 3, 5)
+OP(0x99, STA, A_ABSY, 3, 5)
+
+/* AND: cc=01 */
+OP(0x29, AND, A_IMM,  2, 2)
+OP(0x2D, AND, A_ABS,  3, 4)
+OP(0x25, AND, A_ZPG,  2, 3)
+OP(0x21, AND, A_INDX, 2, 6)
+OP(0x31, AND, A_INDY, 2, 5 | PL)
+OP(0x35, AND, A_ZPGX, 2, 4)
+OP(0x3D, AND, A_ABSX, 3, 4 | PL)
+OP(0x39, AND, A_ABSY, 3, 4 | PL)
+
+/* ORA: cc=01 */
+OP(0x09, ORA, A_IMM,  2, 2)
+OP(0x0D, ORA, A_ABS,  3, 4)
+OP(0x05, ORA, A_ZPG,  2, 3)
+OP(0x01, ORA, A_INDX, 2, 6)
+OP(0x11, ORA, A_INDY, 2, 5 | PL)
+OP(0x15, ORA, A_ZPGX, 2, 4)
+OP(0x1D, ORA, A_ABSX, 3, 4 | PL)
+OP(0x19, ORA, A_ABSY, 3, 4 | PL)
+
+/* EOR: cc=01 */
+OP(0x49, EOR, A_IMM,  2, 2)
+OP(0x4D, EOR, A_ABS,  3, 4)
+OP(0x45, EOR, A_ZPG,  2, 3)
+OP(0x41, EOR, A_INDX, 2, 6)
+OP(0x51, EOR, A_INDY, 2, 5 | PL)
+OP(0x55, EOR, A_ZPGX, 2, 4)
+OP(0x5D, EOR, A_ABSX, 3, 4 | PL)
+OP(0x59, EOR, A_ABSY, 3, 4 | PL)
+
+/* CMP: cc=01 */
+OP(0xC9, CMP, A_IMM,  2, 2)
+OP(0xCD, CMP, A_ABS,  3, 4)
+OP(0xC5, CMP, A_ZPG,  2, 3)
+OP(0xC1, CMP, A_INDX, 2, 6)
+OP(0xD1, CMP, A_INDY, 2, 5 | PL)
+OP(0xD5, CMP, A_ZPGX, 2, 4)
+OP(0xDD, CMP, A_ABSX, 3, 4 | PL)
+OP(0xD9, CMP, A_ABSY, 3, 4 | PL)
+
+/* ADC: cc=01 */
+OP(0x69, ADC, A_IMM,  2, 2)
+OP(0x6D, ADC, A_ABS,  3, 4)
+OP(0x65, ADC, A_ZPG,  2, 3)
+OP(0x61, ADC, A_INDX, 2, 6)
+OP(0x71, ADC, A_INDY, 2, 5 | PL)
+OP(0x75, ADC, A_ZPGX, 2, 4)
+OP(0x7D, ADC, A_ABSX, 3, 4 | PL)
+OP(0x79, ADC, A_ABSY, 3, 4 | PL)
+
+/* SBC: cc=01 */
+OP(0xE9, SBC, A_IMM,  2, 2)
+OP(0xED, SBC, A_ABS,  3, 4)
+OP(0xE5, SBC, A_ZPG,  2, 3)
+OP(0xE1, SBC, A_INDX, 2, 6)
+OP(0xF1, SBC, A_INDY, 2, 5 | PL)
+OP(0xF5, SBC, A_ZPGX, 2, 4)
+OP(0xFD, SBC, A_ABSX, 3, 4 | PL)
+OP(0xF9, SBC, A_ABSY, 3, 4 | PL)

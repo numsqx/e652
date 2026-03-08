@@ -24,18 +24,6 @@ static inline word reslv_rel (void);
 static inline word reslv_indir (void);
 
 
-/* opcode table element struct */
-struct opinfo {
-  char *mnemonic;
-  char addr_mode;
-  char length;
-  char base_cycle;
-};
-
-static struct opinfo ops[256];
-
-
-
 void e652_reset (void)
 {
   E.PC = b2(V_RES); /* reset vector */
@@ -97,119 +85,9 @@ int e652_execnext (void)
     #pragma clang diagnostic ignored "-Woverride-init"
     #endif
 
-    /* BRK */
-    [0x00] = &&I_BRK,
-
-    /* NOP: cc=10 */
-    [0xEA] = &&I_NOP, /* NOP */
-
-    /* status flag stuff */
-    [0x38] = &&I_SEC,
-    [0xF8] = &&I_SED,
-    [0x78] = &&I_SEI,
-    [0x18] = &&I_CLC,
-    [0xD8] = &&I_CLD,
-    [0x58] = &&I_CLI,
-    [0xB8] = &&I_CLV,
-
-    /* relative branch stuff */
-    [0x90] = &&I_BCC,
-    [0xB0] = &&I_BCS,
-    [0xF0] = &&I_BEQ,
-    [0xD0] = &&I_BNE,
-    [0x30] = &&I_BMI,
-    [0x10] = &&I_BPL,
-    [0x50] = &&I_BVC,
-    [0x70] = &&I_BVS,
-
-    /* unconditional jumps */
-    [0x4C] = &&I_JMP_abs,
-    [0x6C] = &&I_JMP_ind,
-
-    /* stack access */
-    [0x48] = &&I_PHA, /* push A */
-    [0x08] = &&I_PHP, /* push P */
-    [0x68] = &&I_PLA, /* pull (pop) to A */
-    [0x28] = &&I_PLP, /* pull (pop) to P */
-
-    /* LDA: cc=01 */
-    [0xA9] = &&I_LDA, /* IMM */
-    [0xAD] = &&I_LDA, /* ABS */
-    [0xA5] = &&I_LDA, /* ZPG */
-    [0xA1] = &&I_LDA, /* INDX */
-    [0xB1] = &&I_LDA, /* INDY */
-    [0xB5] = &&I_LDA, /* ZPGX */
-    [0xBD] = &&I_LDA, /* ABSX */
-    [0xB9] = &&I_LDA, /* ABSY */
-
-    /* STA: cc=01 */
-    [0x8D] = &&I_STA, /* ABS */
-    [0x85] = &&I_STA, /* ZPG */
-    [0x81] = &&I_STA, /* INDX */
-    [0x91] = &&I_STA, /* INDY */
-    [0x95] = &&I_STA, /* ZPGX */
-    [0x9D] = &&I_STA, /* ABSX */
-    [0x99] = &&I_STA, /* ABSY */
-
-    /* AND: cc=01 */
-    [0x29] = &&I_AND, /* IMM */
-    [0x2D] = &&I_AND, /* ABS */
-    [0x25] = &&I_AND, /* ZPG */
-    [0x21] = &&I_AND, /* INDX */
-    [0x31] = &&I_AND, /* INDY */
-    [0x35] = &&I_AND, /* ZPGX */
-    [0x3D] = &&I_AND, /* ABSX */
-    [0x39] = &&I_AND, /* ABSY */
-
-    /* ORA: cc=01 */
-    [0x09] = &&I_ORA, /* IMM */
-    [0x0D] = &&I_ORA, /* ABS */
-    [0x05] = &&I_ORA, /* ZPG */
-    [0x01] = &&I_ORA, /* INDX */
-    [0x11] = &&I_ORA, /* INDY */
-    [0x15] = &&I_ORA, /* ZPGX */
-    [0x1D] = &&I_ORA, /* ABSX */
-    [0x19] = &&I_ORA, /* ABSY */
-
-    /* EOR: cc=01 */
-    [0x49] = &&I_EOR, /* IMM */
-    [0x4D] = &&I_EOR, /* ABS */
-    [0x45] = &&I_EOR, /* ZPG */
-    [0x41] = &&I_EOR, /* INDX */
-    [0x51] = &&I_EOR, /* INDY */
-    [0x55] = &&I_EOR, /* ZPGX */
-    [0x5D] = &&I_EOR, /* ABSX */
-    [0x59] = &&I_EOR, /* ABSY */
-
-    /* CMP: cc=01 */
-    [0xC9] = &&I_CMP, /* IMM */
-    [0xCD] = &&I_CMP, /* ABS */
-    [0xC5] = &&I_CMP, /* ZPG */
-    [0xC1] = &&I_CMP, /* INDX */
-    [0xD1] = &&I_CMP, /* INDY */
-    [0xD5] = &&I_CMP, /* ZPGX */
-    [0xDD] = &&I_CMP, /* ABSX */
-    [0xD9] = &&I_CMP, /* ABSY */
-
-    /* ADC: cc=01 */
-    [0x69] = &&I_ADC, /* IMM */
-    [0x6D] = &&I_ADC, /* ABS */
-    [0x65] = &&I_ADC, /* ZPG */
-    [0x61] = &&I_ADC, /* INDX */
-    [0x71] = &&I_ADC, /* INDY */
-    [0x75] = &&I_ADC, /* ZPGX */
-    [0x7D] = &&I_ADC, /* ABSX */
-    [0x79] = &&I_ADC, /* ABSY */
-
-    /* SBC: cc=01 */
-    [0xE9] = &&I_SBC, /* IMM */
-    [0xED] = &&I_SBC, /* ABS */
-    [0xE5] = &&I_SBC, /* ZPG */
-    [0xE1] = &&I_SBC, /* INDX */
-    [0xF1] = &&I_SBC, /* INDY */
-    [0xF5] = &&I_SBC, /* ZPGX */
-    [0xFD] = &&I_SBC, /* ABSX */
-    [0xF9] = &&I_SBC, /* ABSY */
+    #define OP(O,M,A,L,C) [O] = &&I_##M,
+    #include "opcodes.def"
+    #undef OP
 
     #ifdef __clang__
     #pragma clang diagnostic pop
@@ -228,12 +106,8 @@ I_BRK:
   /* TODO: real implementation */
   return H_DBUG;
 
-I_JMP_abs:
-  E.PC = reslv_absn(0);
-  return H_OK;
-
-I_JMP_ind:
-  E.PC = reslv_indir();
+I_JMP:
+  E.PC = (opcode == 0x4C) ? reslv_absn(0) : reslv_indir();
   return H_OK;
 
 I_PHA:
@@ -435,13 +309,3 @@ static inline word reslv_indir (void)
   hi = e652_read((rhi << 8) | ((rlo + 1) & 0xff));
   return (lo | hi << 8) & MMAX;
 }
-
-
-
-#define OP(O,M,A,L,C) \
-  [O] = (struct opinfo){(#M),(A),(L),(C)}
-
-static struct opinfo ops[256] = {
-  OP(0xEA, nop, A_NONE, 1, 2),
-  /* TODO: migrate stuff here */
-};
